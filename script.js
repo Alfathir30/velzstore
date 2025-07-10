@@ -337,9 +337,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
   console.log("Initialization complete!")
 
-  // Tambahkan dropdown negara NOKOS jika ada grid NOKOS
+  // Tambahkan dropdown negara NOKOS + search box jika ada grid NOKOS
   const nokosGrid = document.getElementById("nokosProductGrid");
   if (nokosGrid && !document.getElementById("nokosNegaraSelect")) {
+    // Container untuk filter
+    const filterContainer = document.createElement("div");
+    filterContainer.style.display = "flex";
+    filterContainer.style.gap = "12px";
+    filterContainer.style.marginBottom = "16px";
+    filterContainer.style.flexWrap = "wrap";
+    filterContainer.style.alignItems = "center";
+
+    // Dropdown negara
     const negaraSelect = document.createElement("select");
     negaraSelect.id = "nokosNegaraSelect";
     negaraSelect.className = "nokos-negara-select";
@@ -396,7 +405,21 @@ document.addEventListener("DOMContentLoaded", () => {
       <option value="50">Portugal</option>
     `;
     negaraSelect.onchange = renderNokosLayanan;
-    nokosGrid.parentNode.insertBefore(negaraSelect, nokosGrid);
+    filterContainer.appendChild(negaraSelect);
+
+    // Search box
+    const searchInput = document.createElement("input");
+    searchInput.type = "text";
+    searchInput.id = "nokosSearchInput";
+    searchInput.placeholder = "Cari layanan (misal: WhatsApp, Telegram, dll)";
+    searchInput.style.padding = "6px 10px";
+    searchInput.style.borderRadius = "6px";
+    searchInput.style.border = "1px solid #ccc";
+    searchInput.style.minWidth = "180px";
+    searchInput.oninput = renderNokosLayanan;
+    filterContainer.appendChild(searchInput);
+
+    nokosGrid.parentNode.insertBefore(filterContainer, nokosGrid);
   }
 })
 
@@ -1183,11 +1206,17 @@ async function fetchNokosLayanan(negaraId = 6) {
 async function renderNokosLayanan() {
   const grid = document.getElementById("nokosProductGrid");
   const negaraSelect = document.getElementById("nokosNegaraSelect");
+  const searchInput = document.getElementById("nokosSearchInput");
   let negaraId = 6;
   if (negaraSelect) negaraId = negaraSelect.value;
   if (!grid) return;
   grid.innerHTML = "<div>Loading layanan...</div>";
-  const layanan = await fetchNokosLayanan(negaraId);
+  let layanan = await fetchNokosLayanan(negaraId);
+  // Filter by search
+  if (searchInput && searchInput.value.trim()) {
+    const q = searchInput.value.trim().toLowerCase();
+    layanan = layanan.filter(l => l.layanan.toLowerCase().includes(q));
+  }
   if (!layanan.length) {
     grid.innerHTML = "<div style='padding:2em;text-align:center;'>Tidak ada layanan tersedia saat ini.</div>";
     return;
