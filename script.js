@@ -336,6 +336,68 @@ document.addEventListener("DOMContentLoaded", () => {
   }, 100)
 
   console.log("Initialization complete!")
+
+  // Tambahkan dropdown negara NOKOS jika ada grid NOKOS
+  const nokosGrid = document.getElementById("nokosProductGrid");
+  if (nokosGrid && !document.getElementById("nokosNegaraSelect")) {
+    const negaraSelect = document.createElement("select");
+    negaraSelect.id = "nokosNegaraSelect";
+    negaraSelect.className = "nokos-negara-select";
+    negaraSelect.innerHTML = `
+      <option value="6">Indonesia</option>
+      <option value="1">Rusia</option>
+      <option value="2">Ukraina</option>
+      <option value="3">Kazakhstan</option>
+      <option value="4">China</option>
+      <option value="5">India</option>
+      <option value="7">Malaysia</option>
+      <option value="8">Amerika Serikat</option>
+      <option value="9">Inggris</option>
+      <option value="10">Vietnam</option>
+      <option value="11">Myanmar</option>
+      <option value="12">Filipina</option>
+      <option value="13">Kamboja</option>
+      <option value="14">Laos</option>
+      <option value="15">Hong Kong</option>
+      <option value="16">Thailand</option>
+      <option value="17">Jerman</option>
+      <option value="18">Korea Selatan</option>
+      <option value="19">Jepang</option>
+      <option value="20">Turki</option>
+      <option value="21">Prancis</option>
+      <option value="22">Spanyol</option>
+      <option value="23">Italia</option>
+      <option value="24">Polandia</option>
+      <option value="25">Rumania</option>
+      <option value="26">Bangladesh</option>
+      <option value="27">Pakistan</option>
+      <option value="28">Mesir</option>
+      <option value="29">Arab Saudi</option>
+      <option value="30">Brazil</option>
+      <option value="31">Argentina</option>
+      <option value="32">Meksiko</option>
+      <option value="33">Kolombia</option>
+      <option value="34">Afrika Selatan</option>
+      <option value="35">Nigeria</option>
+      <option value="36">Ghana</option>
+      <option value="37">Ethiopia</option>
+      <option value="38">Australia</option>
+      <option value="39">Kanada</option>
+      <option value="40">Israel</option>
+      <option value="41">Belanda</option>
+      <option value="42">Swiss</option>
+      <option value="43">Swedia</option>
+      <option value="44">Norwegia</option>
+      <option value="45">Denmark</option>
+      <option value="46">Finlandia</option>
+      <option value="47">Ceko</option>
+      <option value="48">Slovakia</option>
+      <option value="49">Hungaria</option>
+      <option value="50">Portugal</option>
+    `;
+    negaraSelect.onchange = renderNokosLayanan;
+    nokosGrid.parentNode.insertBefore(negaraSelect, nokosGrid);
+  }
 })
 
 // Category Functions
@@ -1104,10 +1166,10 @@ function displayOrderStatus(data) {
 }
 
 // --- NOKOS DYNAMIC PRODUCT FETCH ---
-async function fetchNokosLayanan() {
-  const negaraId = 6;
+async function fetchNokosLayanan(negaraId = 6) {
   try {
-    const res = await fetch(`https://api.jasaotp.id/v1/layanan.php?negara=${negaraId}`);
+    // Fetch ke Netlify Function, negaraId bisa diganti sesuai pilihan user
+    const res = await fetch(`/.netlify/functions/get-nokos-layanan?negara=${negaraId}`);
     const data = await res.json();
     if (!data[negaraId]) return [];
     return Object.entries(data[negaraId])
@@ -1120,9 +1182,12 @@ async function fetchNokosLayanan() {
 
 async function renderNokosLayanan() {
   const grid = document.getElementById("nokosProductGrid");
+  const negaraSelect = document.getElementById("nokosNegaraSelect");
+  let negaraId = 6;
+  if (negaraSelect) negaraId = negaraSelect.value;
   if (!grid) return;
   grid.innerHTML = "<div>Loading layanan...</div>";
-  const layanan = await fetchNokosLayanan();
+  const layanan = await fetchNokosLayanan(negaraId);
   if (!layanan.length) {
     grid.innerHTML = "<div style='padding:2em;text-align:center;'>Tidak ada layanan tersedia saat ini.</div>";
     return;
