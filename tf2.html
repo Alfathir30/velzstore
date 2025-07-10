@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Transfer E-Wallet - Velz Store</title>
+</head>
+<body>
+  <h2>Transfer ke E-Wallet</h2>
+
+  <form id="transferForm">
+    <label>Pilih E-Wallet:</label>
+    <select name="kode_bank" required>
+      <option value="dana">DANA</option>
+      <option value="gopay">GoPay</option>
+      <option value="ovo">OVO</option>
+      <option value="shopeepay">ShopeePay</option>
+      <option value="linkaja">LinkAja</option>
+    </select><br><br>
+
+    <label>Nomor Akun (HP):</label>
+    <input type="text" name="nomor_akun" required><br><br>
+
+    <label>Nama Pemilik:</label>
+    <input type="text" name="nama_pemilik" required><br><br>
+
+    <label>Nominal (Rp):</label>
+    <input type="number" name="nominal" min="10000" required><br><br>
+
+    <button type="submit">Kirim</button>
+  </form>
+
+  <pre id="result" style="margin-top: 20px;"></pre>
+
+  <script>
+    const form = document.getElementById('transferForm');
+    const result = document.getElementById('result');
+
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+      const data = {
+        api_key: 'atIjCYZqOkNwQf379v0gmmdSpzfJUvHBMW93oQ9dxBqCjilCzvbqGhrn11BRVo3bkceD9adBMXHpt6tC3oWisS3j710deVVbctk1', // GANTI API KEY
+        ref_id: 'VELZ-' + Date.now(),
+        kode_bank: formData.get('kode_bank'),
+        nomor_akun: formData.get('nomor_akun'),
+        nama_pemilik: formData.get('nama_pemilik'),
+        nominal: formData.get('nominal'),
+        email: '',
+        phone: formData.get('nomor_akun'),
+        note: 'Top up dari Velz Store'
+      };
+
+      const encoded = new URLSearchParams(data).toString();
+
+      const res = await fetch('https://atlantich2h.com/transfer/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: encoded
+      });
+
+      const json = await res.json();
+
+      if (json.status) {
+        result.textContent =
+          `✅ Transfer Berhasil!\n` +
+          `ID Transaksi : ${json.data.id}\n` +
+          `Tujuan       : ${json.data.nomor_tujuan}\n` +
+          `Nama         : ${json.data.nama}\n` +
+          `Jumlah       : Rp ${json.data.nominal}\n` +
+          `Status       : ${json.data.status}`;
+      } else {
+        result.textContent = `❌ Gagal: ${json.message || 'Tidak diketahui'}`;
+      }
+    });
+  </script>
+</body>
+</html>

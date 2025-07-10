@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Layanan Nomor OTP (Nokos)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header animate-fade-in">
+      <div class="logo">
+        <span class="logo-icon">🛒</span>
+        Digital Store
+      </div>
+      <a href="index.html" class="check-manual-link">Kembali ke Beranda</a>
+    </header>
+    <section class="hero-section animate-slide-up">
+      <div class="hero-content">
+        <h1 class="hero-title">Layanan Nomor OTP (Nokos)</h1>
+        <p class="hero-description">
+          Pilih dan pesan nomor virtual untuk verifikasi berbagai platform (WhatsApp, Telegram, Instagram, dll)
+        </p>
+        <div class="hero-badge">
+          <span class="badge-icon">📞</span>
+          Layanan Nomor OTP Indonesia
+        </div>
+      </div>
+    </section>
+    <section class="products-section">
+      <div class="section-header animate-fade-in">
+        <h2>Layanan Nomor OTP</h2>
+        <p>Pilih layanan sesuai kebutuhan Anda</p>
+      </div>
+      <div class="product-grid" id="nokosProductGrid">
+        <!-- Produk nokos akan dimuat otomatis oleh script.js -->
+      </div>
+    </section>
+    <footer class="footer animate-fade-in">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <div class="logo">
+            <span class="logo-icon">🛒</span>
+            Digital Store
+          </div>
+          <p>Investasi terbaik untuk masa depan digital Anda</p>
+        </div>
+        <div class="footer-info">
+          <p>&copy; 2024 Digital Store. Semua hak dilindungi.</p>
+          <p>Pembayaran aman dengan QRIS</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Login/Register Modal -->
+  <div class="modal" id="authModal" style="display:none;">
+    <div class="modal-content auth-modal">
+      <h2 id="authTitle">Login ke Layanan Nokos</h2>
+      <form id="authForm">
+        <div class="form-group">
+          <label for="authEmail">Email</label>
+          <input type="email" id="authEmail" required placeholder="Email">
+        </div>
+        <div class="form-group">
+          <label for="authPassword">Password</label>
+          <input type="password" id="authPassword" required placeholder="Password">
+        </div>
+        <button type="submit" class="btn-primary" id="authSubmit">Login</button>
+      </form>
+      <p id="authSwitchText">Belum punya akun? <a href="#" id="switchToRegister">Daftar di sini</a></p>
+    </div>
+  </div>
+
+  <!-- Dashboard User Nokos -->
+  <section id="nokosDashboard" style="display:none;">
+    <div class="user-info-card">
+      <h3>👤 Selamat datang, <span id="userEmail"></span></h3>
+      <div class="saldo-info">Saldo Anda: <span id="userSaldo">Rp 0</span></div>
+      <button class="btn-primary" id="depositBtn">Deposit Saldo</button>
+      <button class="btn-secondary" id="logoutBtn">Logout</button>
+    </div>
+    <div class="order-section">
+      <h3>Order Nomor OTP</h3>
+      <form id="orderForm">
+        <div class="form-group">
+          <label for="layananSelect">Layanan</label>
+          <select id="layananSelect" required>
+            <option value="wa">WhatsApp</option>
+            <option value="fb">Facebook</option>
+            <option value="tg">Telegram</option>
+            <option value="ig">Instagram</option>
+            <option value="tw">Twitter/X</option>
+            <option value="go">Google</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="operatorSelect">Operator</label>
+          <select id="operatorSelect" required>
+            <option value="any">Any</option>
+            <option value="telkomsel">Telkomsel</option>
+            <option value="indosat">Indosat</option>
+            <option value="axis">Axis</option>
+            <option value="three">Three</option>
+            <option value="smartfren">Smartfren</option>
+            <option value="byu">By.U</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-primary">Order Sekarang</button>
+      </form>
+    </div>
+    <div class="riwayat-section">
+      <h3>Riwayat Order Anda</h3>
+      <table class="riwayat-table">
+        <thead>
+          <tr><th>Tanggal</th><th>Layanan</th><th>Nomor</th><th>Status</th><th>OTP</th></tr>
+        </thead>
+        <tbody id="riwayatBody">
+          <!-- Riwayat order user -->
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <script src="script.js"></script>
+  <script>
+    // Panggil renderNokosLayanan() agar produk NOKOS tampil dinamis dari API
+    document.addEventListener("DOMContentLoaded", function() {
+      renderNokosLayanan();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Service Admin - Digital Store</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f7fa;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2d3748;
+            margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .loading {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .balance-display {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .balance-amount {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .order-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .order-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .status-waiting { background: #fff3cd; color: #856404; }
+        .status-received { background: #d4edda; color: #155724; }
+        .status-cancelled { background: #f8d7da; color: #721c24; }
+        .otp-code {
+            background: #e6fffa;
+            border: 2px solid #38b2ac;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            color: #234e52;
+            margin: 10px 0;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .stat-label {
+            color: #718096;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📞 OTP Service Admin Panel</h1>
+        
+        <div class="section">
+            <h3>💰 Saldo OTP Service</h3>
+            <button class="btn" onclick="checkBalance()">Cek Saldo</button>
+            <div id="balanceResult" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="section">
+            <h3>📋 Buat Order OTP Manual</h3>
+            <div class="form-group">
+                <label for="serviceSelect">Pilih Layanan:</label>
+                <select id="serviceSelect">
+                    <option value="wa">WhatsApp</option>
+                    <option value="fb">Facebook</option>
+                    <option value="tg">Telegram</option>
+                    <option value="ig">Instagram</option>
+                    <option value="tw">Twitter</option>
+                    <option value="go">Google</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="operatorSelect">Pilih Operator:</label>
+                <select id="operatorSelect">
+                    <option value="any">Semua Operator</option>
+                    <option value="telkomsel">Telkomsel</option>
+                    <option value="indosat">Indosat</option>
+                    <option value="axis">Axis</option>
+                    <option value="three">Three</option>
+                    <option value="smartfren">Smartfren</option>
+                    <option value="byu">By.U</option>
+                </select>
+            </div>
+            
+            <button class="btn btn-success" onclick="createManualOrder()">Buat Order</button>
+            <div id="orderResult" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="section">
+            <h3>🔍 Cek OTP</h3>
+            <div class="form-group">
+                <label for="orderIdInput">Order ID:</label>
+                <input type="text" id="orderIdInput" placeholder="Masukkan Order ID">
+            </div>
+            <button class="btn" onclick="checkOTP()">Cek OTP</button>
+            <div id="otpResult" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="section">
+            <h3>❌ Cancel Order</h3>
+            <div class="form-group">
+                <label for="cancelOrderIdInput">Order ID untuk Cancel:</label>
+                <input type="text" id="cancelOrderIdInput" placeholder="Masukkan Order ID">
+            </div>
+            <button class="btn btn-danger" onclick="cancelOrder()">Cancel Order</button>
+            <div id="cancelResult" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="section">
+            <h3>📊 Statistik OTP Service</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalOrders">0</div>
+                    <div class="stat-label">Total Orders</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="successOrders">0</div>
+                    <div class="stat-label">Berhasil</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="pendingOrders">0</div>
+                    <div class="stat-label">Menunggu</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="cancelledOrders">0</div>
+                    <div class="stat-label">Dibatalkan</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>📋 Status Monitoring</h3>
+            <p>Monitor semua order OTP yang sedang berjalan:</p>
+            <button class="btn" onclick="refreshOrders()">Refresh Orders</button>
+            <div id="ordersContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        let activeOrders = JSON.parse(localStorage.getItem('otpOrders') || '[]');
+
+        function showResult(elementId, message, type = 'info') {
+            const resultDiv = document.getElementById(elementId);
+            resultDiv.style.display = 'block';
+            resultDiv.className = `result ${type}`;
+            resultDiv.textContent = message;
+        }
+
+        function saveOrders() {
+            localStorage.setItem('otpOrders', JSON.stringify(activeOrders));
+            updateStats();
+        }
+
+        function updateStats() {
+            const total = activeOrders.length;
+            const success = activeOrders.filter(o => o.status === 'received').length;
+            const pending = activeOrders.filter(o => o.status === 'waiting').length;
+            const cancelled = activeOrders.filter(o => o.status === 'cancelled').length;
+
+            document.getElementById('totalOrders').textContent = total;
+            document.getElementById('successOrders').textContent = success;
+            document.getElementById('pendingOrders').textContent = pending;
+            document.getElementById('cancelledOrders').textContent = cancelled;
+        }
+
+        async function checkBalance() {
+            showResult('balanceResult', 'Checking balance...', 'loading');
+            
+            try {
+                const response = await fetch('/.netlify/functions/jasaotp-balance');
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    const balanceHtml = `
+                        <div class="balance-display">
+                            <div>💰 Saldo OTP Service</div>
+                            <div class="balance-amount">Rp ${data.balance.toLocaleString('id-ID')}</div>
+                            <div>Status: Aktif ✅</div>
+                        </div>
+                    `;
+                    document.getElementById('balanceResult').innerHTML = balanceHtml;
+                    document.getElementById('balanceResult').className = 'result success';
+                } else {
+                    showResult('balanceResult', `❌ Error: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showResult('balanceResult', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function createManualOrder() {
+            const service = document.getElementById('serviceSelect').value;
+            const operator = document.getElementById('operatorSelect').value;
+            
+            showResult('orderResult', 'Creating order...', 'loading');
+            
+            try {
+                const response = await fetch('/.netlify/functions/jasaotp-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        transaction_id: 'MANUAL_' + Date.now(),
+                        service_code: service,
+                        country_id: '6',
+                        operator: operator
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    const orderInfo = `
+✅ Order berhasil dibuat!
+
+📞 Nomor: ${data.phone_number}
+🆔 Order ID: ${data.order_id}
+📱 Service: ${service.toUpperCase()}
+📡 Operator: ${operator}
+
+Simpan Order ID untuk cek OTP nanti.
+                    `;
+                    showResult('orderResult', orderInfo, 'success');
+                    
+                    // Add to active orders
+                    activeOrders.push({
+                        id: data.order_id,
+                        phone: data.phone_number,
+                        service: service,
+                        operator: operator,
+                        status: 'waiting',
+                        created: new Date().toLocaleString('id-ID'),
+                        otp: null
+                    });
+                    
+                    saveOrders();
+                    refreshOrdersDisplay();
+                } else {
+                    showResult('orderResult', `❌ Error: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showResult('orderResult', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function checkOTP() {
+            const orderId = document.getElementById('orderIdInput').value.trim();
+            
+            if (!orderId) {
+                showResult('otpResult', '❌ Masukkan Order ID terlebih dahulu', 'error');
+                return;
+            }
+            
+            showResult('otpResult', 'Checking OTP...', 'loading');
+            
+            try {
+                const response = await fetch('/.netlify/functions/jasaotp-sms', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        order_id: orderId
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success' && data.otp) {
+                    const otpInfo = `
+✅ OTP Diterima!
+
+🔢 Kode OTP: ${data.otp}
+🆔 Order ID: ${orderId}
+⏰ Waktu: ${new Date().toLocaleString('id-ID')}
+                    `;
+                    showResult('otpResult', otpInfo, 'success');
+                    
+                    // Update order status
+                    const orderIndex = activeOrders.findIndex(o => o.id == orderId);
+                    if (orderIndex !== -1) {
+                        activeOrders[orderIndex].status = 'received';
+                        activeOrders[orderIndex].otp = data.otp;
+                        saveOrders();
+                        refreshOrdersDisplay();
+                    }
+                    
+                    // Add OTP display
+                    const otpDisplay = `<div class="otp-code">${data.otp}</div>`;
+                    document.getElementById('otpResult').innerHTML = otpInfo + otpDisplay;
+                    
+                } else if (data.status === 'waiting') {
+                    showResult('otpResult', '⏳ OTP belum diterima, silakan coba lagi dalam beberapa saat', 'info');
+                } else {
+                    showResult('otpResult', `❌ Error: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showResult('otpResult', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function cancelOrder() {
+            const orderId = document.getElementById('cancelOrderIdInput').value.trim();
+            
+            if (!orderId) {
+                showResult('cancelResult', '❌ Masukkan Order ID terlebih dahulu', 'error');
+                return;
+            }
+            
+            showResult('cancelResult', 'Cancelling order...', 'loading');
+            
+            try {
+                const response = await fetch('/.netlify/functions/jasaotp-cancel', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        order_id: orderId
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    const cancelInfo = `
+✅ Order berhasil dibatalkan!
+
+🆔 Order ID: ${orderId}
+💰 Refund: Rp ${data.refunded_amount ? data.refunded_amount.toLocaleString('id-ID') : '0'}
+⏰ Waktu: ${new Date().toLocaleString('id-ID')}
+                    `;
+                    showResult('cancelResult', cancelInfo, 'success');
+                    
+                    // Update order status
+                    const orderIndex = activeOrders.findIndex(o => o.id == orderId);
+                    if (orderIndex !== -1) {
+                        activeOrders[orderIndex].status = 'cancelled';
+                        saveOrders();
+                        refreshOrdersDisplay();
+                    }
+                } else {
+                    showResult('cancelResult', `❌ Error: ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showResult('cancelResult', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        function refreshOrders() {
+            refreshOrdersDisplay();
+        }
+
+        function refreshOrdersDisplay() {
+            const container = document.getElementById('ordersContainer');
+            
+            if (activeOrders.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #718096;">Belum ada order OTP</p>';
+                return;
+            }
+            
+            const ordersHtml = activeOrders.map(order => `
+                <div class="order-card">
+                    <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 10px;">
+                        <strong>Order #${order.id}</strong>
+                        <span class="order-status status-${order.status}">${order.status}</span>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
+                        <div><strong>📞 Nomor:</strong> ${order.phone}</div>
+                        <div><strong>📱 Service:</strong> ${order.service.toUpperCase()}</div>
+                        <div><strong>📡 Operator:</strong> ${order.operator}</div>
+                        <div><strong>⏰ Dibuat:</strong> ${order.created}</div>
+                    </div>
+                    ${order.otp ? `<div class="otp-code" style="margin-top: 10px;">OTP: ${order.otp}</div>` : ''}
+                    <div style="margin-top: 15px;">
+                        <button class="btn" onclick="checkSpecificOTP('${order.id}')">🔍 Cek OTP</button>
+                        ${order.status === 'waiting' ? `<button class="btn btn-danger" onclick="cancelSpecificOrder('${order.id}')">❌ Cancel</button>` : ''}
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = ordersHtml;
+        }
+
+        async function checkSpecificOTP(orderId) {
+            document.getElementById('orderIdInput').value = orderId;
+            await checkOTP();
+        }
+
+        async function cancelSpecificOrder(orderId) {
+            document.getElementById('cancelOrderIdInput').value = orderId;
+            await cancelOrder();
+        }
+
+        // Auto refresh orders every 30 seconds
+        setInterval(() => {
+            if (activeOrders.some(o => o.status === 'waiting')) {
+                console.log('Auto checking pending orders...');
+                activeOrders.filter(o => o.status === 'waiting').forEach(order => {
+                    checkSpecificOTP(order.id);
+                });
+            }
+        }, 30000);
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStats();
+            refreshOrdersDisplay();
+            checkBalance();
+        });
+    </script>
+</body>
+</html>
