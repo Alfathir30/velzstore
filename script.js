@@ -1233,8 +1233,17 @@ async function renderNokosLayanan() {
 
 window.renderNokosLayanan = renderNokosLayanan;
 window.orderNokos = function(kode, harga, nama) {
-  alert(`Order: ${nama} (kode: ${kode})\nHarga: Rp ${harga.toLocaleString()}`);
-  // TODO: Tampilkan form/modal order NOKOS di sini
+  // Set selectedProduct sesuai format produk NOKOS dinamis
+  selectedProduct = {
+    id: `nokos-${kode}`,
+    name: nama,
+    price: harga,
+    type: "service",
+    service_code: kode,
+    formFields: ["basic", "otp-service"],
+    // Bisa tambahkan country_id dari dropdown jika ingin
+  };
+  openPurchaseModal();
 };
 
 // Initialize animations
