@@ -318,24 +318,21 @@ document.addEventListener("DOMContentLoaded", () => {
   paymentModal = document.getElementById("paymentModal")
   checkStatusModal = document.getElementById("checkStatusModal")
 
-  // Check if elements exist
+  // --- FIX: Jangan error jika productGrid tidak ditemukan, lanjutkan untuk halaman lain (misal nokos.html) ---
   if (!productGrid) {
-    console.error("productGrid element not found!")
-    return
+    console.warn("productGrid element not found! (Abaikan jika bukan di halaman utama)")
+    // Jangan return, biarkan script jalan untuk fitur lain (misal NOKOS)
+  } else {
+    console.log("Elements found, loading products...")
+    // Load initial products
+    loadProducts("semua")
+    initializeAnimations()
+    // Initialize calculator with default values
+    setTimeout(() => {
+      calculatePrice()
+    }, 100)
+    console.log("Initialization complete!")
   }
-
-  console.log("Elements found, loading products...")
-
-  // Load initial products
-  loadProducts("semua")
-  initializeAnimations()
-
-  // Initialize calculator with default values
-  setTimeout(() => {
-    calculatePrice()
-  }, 100)
-
-  console.log("Initialization complete!")
 
   // Tambahkan dropdown negara NOKOS + search box jika ada grid NOKOS
   const nokosGrid = document.getElementById("nokosProductGrid");
