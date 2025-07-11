@@ -124,12 +124,55 @@
     </div>
   </section>
 
+  <!-- Modal Deposit Saldo -->
+  <div class="modal" id="depositModal" style="display:none;">
+    <div class="modal-content">
+      <h2>Deposit Saldo</h2>
+      <form id="depositForm">
+        <label>Nominal Deposit (minimal Rp 500)</label>
+        <input type="number" id="depositAmount" min="500" required placeholder="Minimal 500">
+        <button type="submit" class="btn-primary">Lanjutkan Pembayaran</button>
+      </form>
+      <div id="depositResult"></div>
+      <button onclick="closeDepositModal()" class="btn-secondary">Tutup</button>
+    </div>
+  </div>
+
   <script src="script.js"></script>
   <script>
     // Panggil renderNokosLayanan() agar produk NOKOS tampil dinamis dari API
     document.addEventListener("DOMContentLoaded", function() {
       renderNokosLayanan();
     });
+
+    // Deposit Modal Logic
+    document.getElementById('depositBtn').onclick = function() {
+      document.getElementById('depositModal').style.display = 'flex';
+    };
+    function closeDepositModal() {
+      document.getElementById('depositModal').style.display = 'none';
+      document.getElementById('depositResult').innerHTML = '';
+    }
+    document.getElementById('depositForm').onsubmit = async function(e) {
+      e.preventDefault();
+      const amount = parseInt(document.getElementById('depositAmount').value);
+      if (amount < 500) return alert('Minimal deposit 500');
+      document.getElementById('depositResult').innerHTML = 'Memproses pembayaran...';
+      // Kirim ke Netlify Function
+      const user = firebase.auth().currentUser;
+      if (!user) return alert('Harus login!');
+      const res = await fetch('/.netlify/functions/process-deposit', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: `uid=${user.uid}&email=${encodeURIComponent(user.email)}&amount=${amount}`
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        document.getElementById('depositResult').innerHTML = 'Silakan scan QRIS/VA berikut:<br><img src="'+data.qr_image_url+'" style="max-width:200px"><br>ID Deposit: '+data.deposit_id+'<br>Setelah transfer, saldo akan masuk otomatis.';
+      } else {
+        document.getElementById('depositResult').innerHTML = 'Gagal: ' + data.message;
+      }
+    };
   </script>
 </body>
 </html>
