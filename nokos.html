@@ -140,7 +140,85 @@
   </div>
 
   <script src="script.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <script>
+    // Konfigurasi Firebase (ganti dengan config projectmu)
+const firebaseConfig = {
+  apiKey: "AIzaSyAdfJaCT_URd6SBiG-5uXpo7MCZEPw4mDc",
+  authDomain: "store-velz.firebaseapp.com",
+  databaseURL: "https://store-velz-default-rtdb.firebaseio.com",
+  projectId: "store-velz",
+  storageBucket: "store-velz.firebasestorage.app",
+  messagingSenderId: "807858653644",
+  appId: "1:807858653644:web:44bd848998d2efad0cb569",
+  measurementId: "G-4QLD9YFKZM"
+};
+    firebase.initializeApp(firebaseConfig);
+
+    // Cek status login
+    firebase.auth().onAuthStateChanged(function(user) {
+      if (user) {
+        document.getElementById('authModal').style.display = 'none';
+        document.getElementById('nokosDashboard').style.display = 'block';
+        document.getElementById('userEmail').textContent = user.email;
+        // Ambil saldo user
+        firebase.database().ref('users/' + user.uid + '/saldo').on('value', function(snap) {
+          document.getElementById('userSaldo').textContent = 'Rp ' + (snap.val() || 0);
+        });
+      } else {
+        document.getElementById('authModal').style.display = 'flex';
+        document.getElementById('nokosDashboard').style.display = 'none';
+      }
+    });
+
+    // Login/Register logic
+    let mode = 'login';
+    document.getElementById('switchToRegister').onclick = function(e) {
+      e.preventDefault();
+      mode = 'register';
+      document.getElementById('authTitle').textContent = 'Daftar Akun Nokos';
+      document.getElementById('authSubmit').textContent = 'Daftar';
+      document.getElementById('authSwitchText').innerHTML = 'Sudah punya akun? <a href="#" id="switchToLogin">Login di sini</a>';
+      document.getElementById('switchToLogin').onclick = switchToLogin;
+    };
+    function switchToLogin(e) {
+      if(e) e.preventDefault();
+      mode = 'login';
+      document.getElementById('authTitle').textContent = 'Login ke Layanan Nokos';
+      document.getElementById('authSubmit').textContent = 'Login';
+      document.getElementById('authSwitchText').innerHTML = 'Belum punya akun? <a href="#" id="switchToRegister">Daftar di sini</a>';
+      document.getElementById('switchToRegister').onclick = function(e) {
+        e.preventDefault();
+        mode = 'register';
+        document.getElementById('authTitle').textContent = 'Daftar Akun Nokos';
+        document.getElementById('authSubmit').textContent = 'Daftar';
+        document.getElementById('authSwitchText').innerHTML = 'Sudah punya akun? <a href="#" id="switchToLogin">Login di sini</a>';
+        document.getElementById('switchToLogin').onclick = switchToLogin;
+      };
+    }
+    document.getElementById('authForm').onsubmit = function(e) {
+      e.preventDefault();
+      const email = document.getElementById('authEmail').value;
+      const pass = document.getElementById('authPassword').value;
+      if (mode === 'login') {
+        firebase.auth().signInWithEmailAndPassword(email, pass)
+          .catch(err => alert('Login gagal: ' + err.message));
+      } else {
+        firebase.auth().createUserWithEmailAndPassword(email, pass)
+          .then(cred => {
+            // Set saldo awal 0
+            firebase.database().ref('users/' + cred.user.uid).set({ saldo: 0, email: email });
+          })
+          .catch(err => alert('Registrasi gagal: ' + err.message));
+      }
+    };
+    // Logout
+    document.getElementById('logoutBtn').onclick = function() {
+      firebase.auth().signOut();
+    };
+
     // Panggil renderNokosLayanan() agar produk NOKOS tampil dinamis dari API
     document.addEventListener("DOMContentLoaded", function() {
       renderNokosLayanan();
