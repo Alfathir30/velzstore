@@ -37,12 +37,19 @@ exports.handler = async function(event) {
     return { statusCode: 400, body: JSON.stringify({ status: 'error', message: 'Data tidak valid' }) };
   }
 
+  // Generate reff_id unik (mirip PHP)
+  const reffId = 'WEBSTORE-' + Date.now() + Math.random().toString(36).substr(2, 5).toUpperCase();
+
   try {
-    // 1. Buat request deposit ke Atlantic H2H (endpoint /deposit/create) dengan metode QRIS
+    // Request ke Atlantic H2H sesuai pola PHP
     const createRes = await fetch(`${ATLANTIC_BASE_URL}/deposit/create`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: `api_key=${ATLANTIC_API_KEY}&amount=${amount}&method=qris&customer_name=${encodeURIComponent(email)}`
+      body: `api_key=${ATLANTIC_API_KEY}` +
+            `&reff_id=${reffId}` +
+            `&nominal=${amount}` +
+            `&type=ewallet` +
+            `&metode=qrisfast`
     });
     const createData = await createRes.json();
     console.log('Atlantic H2H response:', createData);
@@ -50,7 +57,7 @@ exports.handler = async function(event) {
       return { statusCode: 500, body: JSON.stringify({ status: 'error', message: 'Gagal membuat deposit QRIS', atlantic: createData }) };
     }
     const depositId = createData.data.id;
-    const qrImageUrl = createData.data.qr_image_url || createData.data.qr_url || '';
+    const qrImageUrl = createData.data.qr_image || createData.data.qr_image_url || createData.data.qr_url || '';
 
     // 2. Kirim info ke Telegram
     const msg = `💸 DEPOSIT BARU\nUser: ${email}\nUID: ${uid}\nNominal: Rp ${amount.toLocaleString('id-ID')}\nID Deposit: ${depositId}`;
@@ -60,15 +67,15 @@ exports.handler = async function(event) {
       body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: msg })
     });
 
-    // 3. (Opsional) Simpan status deposit ke Firebase (untuk tracking)
+    // 3. Simpan status deposit ke Firebase
     await admin.database().ref(`deposits/${depositId}`).set({
-      uid, email, amount, status: 'pending', created_at: Date.now()
+      uid, email, amount, reff_id: reffId, status: 'pending', created_at: Date.now()
     });
 
     // 4. Return ke frontend (tampilkan QRIS/VA)
     return {
       statusCode: 200,
-      body: JSON.stringify({ status: 'success', deposit_id: depositId, qr_image_url: qrImageUrl })
+      body: JSON.stringify({ status: 'success', deposit_id: depositId, qr_image_url: qrImageUrl, reff_id: reffId })
     };
 
     // 5. Setelah user transfer, Anda perlu webhook/pooling untuk proses /deposit/instant,
