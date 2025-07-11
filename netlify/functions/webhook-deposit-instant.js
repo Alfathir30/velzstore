@@ -8,7 +8,7 @@ if (!admin.apps.length) {
   });
 }
 
-const ATLANTIC_API_KEY = 'your_atlantic_api_key'; // Ganti dengan API KEY Atlantic H2H Anda
+const ATLANTIC_API_KEY = 'atIjCYZqOkNwQf379v0gmmdSpzfJUvHBMW93oQ9dxBqCjilCzvbqGhrn11BRVo3bkceD9adBMXHpt6tC3oWisS3j710deVVbctk1'; // Ganti dengan API KEY Atlantic H2H Anda
 const ATLANTIC_BASE_URL = 'https://atlantich2h.com';
 const TELEGRAM_TOKEN = '7502786930:AAHs772-MhmbhJDJfFlgrt6BErmLS_roNcY';
 const TELEGRAM_CHAT_ID = '1937864089';
