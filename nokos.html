@@ -16,6 +16,15 @@
       </div>
       <a href="index.html" class="check-manual-link">Kembali ke Beranda</a>
     </header>
+    <!-- User Info Card dipindah ke atas -->
+    <section id="userInfoSection" style="display:none;">
+      <div class="user-info-card">
+        <h3>👤 Selamat datang, <span id="userEmail"></span></h3>
+        <div class="saldo-info">Saldo Anda: <span id="userSaldo">Rp 0</span></div>
+        <button class="btn-primary" id="depositBtn">Deposit Saldo</button>
+        <button class="btn-secondary" id="logoutBtn">Logout</button>
+      </div>
+    </section>
     <section class="hero-section animate-slide-up">
       <div class="hero-content">
         <h1 class="hero-title">Layanan Nomor OTP (Nokos)</h1>
@@ -154,6 +163,17 @@
     </div>
   </div>
 
+  <!-- Modal untuk Cek OTP dan Cancel Order -->
+  <div class="modal" id="otpActionModal" style="display:none;">
+    <div class="modal-content">
+      <h2 id="otpActionTitle">Aksi Order NOKOS</h2>
+      <div id="otpActionContent">
+        <!-- Konten cek/cancel OTP akan diisi via script.js -->
+      </div>
+      <button onclick="document.getElementById('otpActionModal').style.display='none'" class="btn-secondary">Tutup</button>
+    </div>
+  </div>
+
   <script src="script.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
@@ -176,6 +196,7 @@ const firebaseConfig = {
     firebase.auth().onAuthStateChanged(function(user) {
       if (user) {
         document.getElementById('authModal').style.display = 'none';
+        document.getElementById('userInfoSection').style.display = 'block';
         document.getElementById('nokosDashboard').style.display = 'block';
         document.getElementById('userEmail').textContent = user.email;
         // Ambil saldo user
@@ -184,6 +205,7 @@ const firebaseConfig = {
         });
       } else {
         document.getElementById('authModal').style.display = 'flex';
+        document.getElementById('userInfoSection').style.display = 'none';
         document.getElementById('nokosDashboard').style.display = 'none';
       }
     });
