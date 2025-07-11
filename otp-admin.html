@@ -163,97 +163,122 @@
             font-size: 14px;
             margin-top: 5px;
         }
+        #adminAuthBox {text-align:center;margin-bottom:24px;}
     </style>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script>
+      // Ganti dengan config Firebase Anda
+      const firebaseConfig = {
+        apiKey: "API_KEY",
+        authDomain: "PROJECT_ID.firebaseapp.com",
+        databaseURL: "https://PROJECT_ID.firebaseio.com",
+        projectId: "PROJECT_ID",
+        // ...dll
+      };
+      firebase.initializeApp(firebaseConfig);
+    </script>
 </head>
 <body>
-    <div class="container">
-        <h1>📞 OTP Service Admin Panel</h1>
-        
-        <div class="section">
-            <h3>💰 Saldo OTP Service</h3>
-            <button class="btn" onclick="checkBalance()">Cek Saldo</button>
-            <div id="balanceResult" class="result" style="display: none;"></div>
-        </div>
+    <div id="adminAuthBox">
+      <div id="adminAuthInfo" style="display:none;">
+        Login sebagai: <span id="adminEmail"></span>
+        <button class="btn" onclick="logoutAdmin()">Logout</button>
+      </div>
+      <div id="adminLoginBox">
+        <button class="btn btn-success" onclick="loginAdminGoogle()">Login Admin (Google)</button>
+      </div>
+    </div>
+    <div class="container" id="adminPanel" style="display:none;">
+      <h1>📞 OTP Service Admin Panel</h1>
+      
+      <div class="section">
+          <h3>💰 Saldo OTP Service</h3>
+          <button class="btn" onclick="checkBalance()">Cek Saldo</button>
+          <div id="balanceResult" class="result" style="display: none;"></div>
+      </div>
 
-        <div class="section">
-            <h3>📋 Buat Order OTP Manual</h3>
-            <div class="form-group">
-                <label for="serviceSelect">Pilih Layanan:</label>
-                <select id="serviceSelect">
-                    <option value="wa">WhatsApp</option>
-                    <option value="fb">Facebook</option>
-                    <option value="tg">Telegram</option>
-                    <option value="ig">Instagram</option>
-                    <option value="tw">Twitter</option>
-                    <option value="go">Google</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="operatorSelect">Pilih Operator:</label>
-                <select id="operatorSelect">
-                    <option value="any">Semua Operator</option>
-                    <option value="telkomsel">Telkomsel</option>
-                    <option value="indosat">Indosat</option>
-                    <option value="axis">Axis</option>
-                    <option value="three">Three</option>
-                    <option value="smartfren">Smartfren</option>
-                    <option value="byu">By.U</option>
-                </select>
-            </div>
-            
-            <button class="btn btn-success" onclick="createManualOrder()">Buat Order</button>
-            <div id="orderResult" class="result" style="display: none;"></div>
-        </div>
+      <div class="section">
+          <h3>📋 Buat Order OTP Manual</h3>
+          <div class="form-group">
+              <label for="serviceSelect">Pilih Layanan:</label>
+              <select id="serviceSelect">
+                  <option value="wa">WhatsApp</option>
+                  <option value="fb">Facebook</option>
+                  <option value="tg">Telegram</option>
+                  <option value="ig">Instagram</option>
+                  <option value="tw">Twitter</option>
+                  <option value="go">Google</option>
+              </select>
+          </div>
+          
+          <div class="form-group">
+              <label for="operatorSelect">Pilih Operator:</label>
+              <select id="operatorSelect">
+                  <option value="any">Semua Operator</option>
+                  <option value="telkomsel">Telkomsel</option>
+                  <option value="indosat">Indosat</option>
+                  <option value="axis">Axis</option>
+                  <option value="three">Three</option>
+                  <option value="smartfren">Smartfren</option>
+                  <option value="byu">By.U</option>
+              </select>
+          </div>
+          
+          <button class="btn btn-success" onclick="createManualOrder()">Buat Order</button>
+          <div id="orderResult" class="result" style="display: none;"></div>
+      </div>
 
-        <div class="section">
-            <h3>🔍 Cek OTP</h3>
-            <div class="form-group">
-                <label for="orderIdInput">Order ID:</label>
-                <input type="text" id="orderIdInput" placeholder="Masukkan Order ID">
-            </div>
-            <button class="btn" onclick="checkOTP()">Cek OTP</button>
-            <div id="otpResult" class="result" style="display: none;"></div>
-        </div>
+      <div class="section">
+          <h3>🔍 Cek OTP</h3>
+          <div class="form-group">
+              <label for="orderIdInput">Order ID:</label>
+              <input type="text" id="orderIdInput" placeholder="Masukkan Order ID">
+          </div>
+          <button class="btn" onclick="checkOTP()">Cek OTP</button>
+          <div id="otpResult" class="result" style="display: none;"></div>
+      </div>
 
-        <div class="section">
-            <h3>❌ Cancel Order</h3>
-            <div class="form-group">
-                <label for="cancelOrderIdInput">Order ID untuk Cancel:</label>
-                <input type="text" id="cancelOrderIdInput" placeholder="Masukkan Order ID">
-            </div>
-            <button class="btn btn-danger" onclick="cancelOrder()">Cancel Order</button>
-            <div id="cancelResult" class="result" style="display: none;"></div>
-        </div>
+      <div class="section">
+          <h3>❌ Cancel Order</h3>
+          <div class="form-group">
+              <label for="cancelOrderIdInput">Order ID untuk Cancel:</label>
+              <input type="text" id="cancelOrderIdInput" placeholder="Masukkan Order ID">
+          </div>
+          <button class="btn btn-danger" onclick="cancelOrder()">Cancel Order</button>
+          <div id="cancelResult" class="result" style="display: none;"></div>
+      </div>
 
-        <div class="section">
-            <h3>📊 Statistik OTP Service</h3>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-number" id="totalOrders">0</div>
-                    <div class="stat-label">Total Orders</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="successOrders">0</div>
-                    <div class="stat-label">Berhasil</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="pendingOrders">0</div>
-                    <div class="stat-label">Menunggu</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="cancelledOrders">0</div>
-                    <div class="stat-label">Dibatalkan</div>
-                </div>
-            </div>
-        </div>
+      <div class="section">
+          <h3>📊 Statistik OTP Service</h3>
+          <div class="stats-grid">
+              <div class="stat-card">
+                  <div class="stat-number" id="totalOrders">0</div>
+                  <div class="stat-label">Total Orders</div>
+              </div>
+              <div class="stat-card">
+                  <div class="stat-number" id="successOrders">0</div>
+                  <div class="stat-label">Berhasil</div>
+              </div>
+              <div class="stat-card">
+                  <div class="stat-number" id="pendingOrders">0</div>
+                  <div class="stat-label">Menunggu</div>
+              </div>
+              <div class="stat-card">
+                  <div class="stat-number" id="cancelledOrders">0</div>
+                  <div class="stat-label">Dibatalkan</div>
+              </div>
+          </div>
+      </div>
 
-        <div class="section">
-            <h3>📋 Status Monitoring</h3>
-            <p>Monitor semua order OTP yang sedang berjalan:</p>
-            <button class="btn" onclick="refreshOrders()">Refresh Orders</button>
-            <div id="ordersContainer"></div>
-        </div>
+      <div class="section">
+          <h3>📋 Status Monitoring</h3>
+          <p>Monitor semua order OTP yang sedang berjalan:</p>
+          <button class="btn" onclick="refreshOrders()">Refresh Orders</button>
+          <div id="ordersContainer"></div>
+      </div>
     </div>
 
     <script>
@@ -513,7 +538,44 @@ Simpan Order ID untuk cek OTP nanti.
             await cancelOrder();
         }
 
-        // Auto refresh orders every 30 seconds
+        // === ADMIN LOGIN PROTECTION ===
+const allowedAdmins = [
+  "aalifmarvel@gmail.com", // Ganti dengan email admin Anda
+  // Tambahkan email admin lain jika perlu
+];
+function loginAdminGoogle() {
+  var provider = new firebase.auth.GoogleAuthProvider();
+  firebase.auth().signInWithPopup(provider).catch(e => alert(e.message));
+}
+function logoutAdmin() {
+  firebase.auth().signOut();
+}
+function showAdminPanel(user) {
+  if (!allowedAdmins.includes(user.email)) {
+    hideAdminPanel();
+    alert("Akses ditolak! Hanya admin terdaftar yang bisa mengakses panel ini.");
+    firebase.auth().signOut();
+    return;
+  }
+  document.getElementById('adminPanel').style.display = 'block';
+  document.getElementById('adminAuthInfo').style.display = 'inline-block';
+  document.getElementById('adminLoginBox').style.display = 'none';
+  document.getElementById('adminEmail').textContent = user.email;
+}
+function hideAdminPanel() {
+  document.getElementById('adminPanel').style.display = 'none';
+  document.getElementById('adminAuthInfo').style.display = 'none';
+  document.getElementById('adminLoginBox').style.display = 'inline-block';
+  document.getElementById('adminEmail').textContent = '';
+}
+firebase.auth().onAuthStateChanged(function(user) {
+  if (user) {
+    showAdminPanel(user);
+  } else {
+    hideAdminPanel();
+  }
+});
+// Auto refresh orders every 30 seconds
         setInterval(() => {
             if (activeOrders.some(o => o.status === 'waiting')) {
                 console.log('Auto checking pending orders...');
