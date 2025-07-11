@@ -38,17 +38,16 @@ exports.handler = async function(event) {
   }
 
   try {
-    // 1. Buat request deposit ke Atlantic H2H (misal endpoint /deposit/create)
-    // --- Ganti sesuai dokumentasi Atlantic H2H Anda ---
+    // 1. Buat request deposit ke Atlantic H2H (endpoint /deposit/create) dengan metode QRIS
     const createRes = await fetch(`${ATLANTIC_BASE_URL}/deposit/create`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: `api_key=${ATLANTIC_API_KEY}&amount=${amount}&method=qris` // atau method lain
+      body: `api_key=${ATLANTIC_API_KEY}&amount=${amount}&method=qris&customer_name=${encodeURIComponent(email)}`
     });
     const createData = await createRes.json();
-    console.log('Atlantic H2H response:', createData); // Tambahkan log response
+    console.log('Atlantic H2H response:', createData);
     if (!createData.status || !createData.data) {
-      return { statusCode: 500, body: JSON.stringify({ status: 'error', message: 'Gagal membuat deposit', atlantic: createData }) };
+      return { statusCode: 500, body: JSON.stringify({ status: 'error', message: 'Gagal membuat deposit QRIS', atlantic: createData }) };
     }
     const depositId = createData.data.id;
     const qrImageUrl = createData.data.qr_image_url || createData.data.qr_url || '';
