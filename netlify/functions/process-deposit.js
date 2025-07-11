@@ -15,6 +15,17 @@ const TELEGRAM_TOKEN = '7502786930:AAHs772-MhmbhJDJfFlgrt6BErmLS_roNcY';
 const TELEGRAM_CHAT_ID = '1937864089';
 
 exports.handler = async function(event) {
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type'
+      },
+      body: ''
+    };
+  }
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
@@ -35,8 +46,9 @@ exports.handler = async function(event) {
       body: `api_key=${ATLANTIC_API_KEY}&amount=${amount}&method=qris` // atau method lain
     });
     const createData = await createRes.json();
+    console.log('Atlantic H2H response:', createData); // Tambahkan log response
     if (!createData.status || !createData.data) {
-      return { statusCode: 500, body: JSON.stringify({ status: 'error', message: 'Gagal membuat deposit' }) };
+      return { statusCode: 500, body: JSON.stringify({ status: 'error', message: 'Gagal membuat deposit', atlantic: createData }) };
     }
     const depositId = createData.data.id;
     const qrImageUrl = createData.data.qr_image_url || createData.data.qr_url || '';
