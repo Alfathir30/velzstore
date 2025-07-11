@@ -41,20 +41,17 @@ exports.handler = async function(event) {
   const reffId = 'WEBSTORE-' + Date.now() + Math.random().toString(36).substr(2, 5).toUpperCase();
 
   try {
-    // Request ke Atlantic H2H sesuai pola PHP
+    // Request ke Atlantic H2H sesuai pola PHP, urutan dan format sama persis
+    const bodyReq = `api_key=${ATLANTIC_API_KEY}&reff_id=${reffId}&nominal=${amount}&type=ewallet&metode=qrisfast`;
     const createRes = await fetch(`${ATLANTIC_BASE_URL}/deposit/create`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: `api_key=${ATLANTIC_API_KEY}` +
-            `&reff_id=${reffId}` +
-            `&nominal=${amount}` +
-            `&type=ewallet` +
-            `&metode=qrisfast`
+      body: bodyReq
     });
     const createData = await createRes.json();
     console.log('Atlantic H2H response:', createData);
     if (!createData.status || !createData.data) {
-      return { statusCode: 500, body: JSON.stringify({ status: 'error', message: 'Gagal membuat deposit QRIS', atlantic: createData }) };
+      return { statusCode: 500, body: JSON.stringify({ status: 'error', message: 'Gagal membuat deposit QRIS', atlantic: createData, bodyReq }) };
     }
     const depositId = createData.data.id;
     const qrImageUrl = createData.data.qr_image || createData.data.qr_image_url || createData.data.qr_url || '';
