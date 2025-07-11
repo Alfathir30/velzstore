@@ -139,6 +139,21 @@
     </div>
   </div>
 
+  <!-- Modal Order/Purchase NOKOS -->
+  <div class="modal" id="purchaseModal" style="display:none;">
+    <div class="modal-content">
+      <h2>Konfirmasi Order NOKOS</h2>
+      <div id="purchaseModalContent">
+        <!-- Konten order akan diisi via script.js -->
+        <div class="order-actions" style="margin-top:16px; display:flex; gap:8px;">
+          <button id="cekOtpBtn" class="btn-primary" style="display:none;">🔍 Cek OTP</button>
+          <button id="cancelOrderBtn" class="btn-danger" style="display:none;">❌ Cancel Order</button>
+        </div>
+      </div>
+      <button onclick="document.getElementById('purchaseModal').style.display='none'" class="btn-secondary">Tutup</button>
+    </div>
+  </div>
+
   <script src="script.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
