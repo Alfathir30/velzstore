@@ -64,6 +64,7 @@ exports.handler = async function(event) {
     // update saldo user, dan kirim notifikasi ke Telegram jika saldo masuk.
     // (Bisa pakai Netlify Function lain atau cron job)
   } catch (e) {
-    return { statusCode: 500, body: JSON.stringify({ status: 'error', message: e.message }) };
+    console.error('Deposit error:', e);
+    return { statusCode: 500, body: JSON.stringify({ status: 'error', message: e.message, stack: e.stack }) };
   }
 };
