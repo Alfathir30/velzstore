@@ -4,5 +4,9 @@
   "private": true,
   "scripts": {
     "build": "echo 'no build script'"
+  },
+  "dependencies": {
+    "firebase-admin": "^11.10.1",
+    "node-fetch": "^2.6.7"
   }
 }
